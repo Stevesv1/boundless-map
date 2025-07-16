@@ -61,6 +61,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				map: {
+					bg: 'hsl(var(--map-bg))',
+					surface: 'hsl(var(--map-surface))',
+					'surface-hover': 'hsl(var(--map-surface-hover))',
+					border: 'hsl(var(--map-border))',
+					glass: 'hsl(var(--map-glass))',
+					'glass-border': 'hsl(var(--map-glass-border))'
 				}
 			},
 			borderRadius: {
