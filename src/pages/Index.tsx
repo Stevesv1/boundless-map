@@ -1,26 +1,20 @@
 import { useState, useEffect } from 'react';
 import { InteractiveMap } from '@/components/InteractiveMap';
 import { LocationModal } from '@/components/LocationModal';
-import { RecentNotesFeed } from '@/components/RecentNotesFeed';
 import { Button } from '@/components/ui/button';
 import { useMapData } from '@/hooks/useMapData';
-import { LocationModalState } from '@/types/map';
 
 const Index = () => {
   const [isAddingMode, setIsAddingMode] = useState(false);
-  const [modalState, setModalState] = useState<LocationModalState>({
+  const [modalState, setModalState] = useState({
     isOpen: false,
     position: null
   });
-  
-  console.log('Index render:', { isAddingMode, modalState });
-  
-  const { comments, loading, addComment, addReaction, removeReaction } = useMapData();
+
+  const { notes, loading, addNote } = useMapData();
 
   const handleMapClick = (lat: number, lng: number) => {
-    console.log('handleMapClick called:', { lat, lng, isAddingMode });
     if (isAddingMode) {
-      console.log('Setting modal state to open');
       setModalState({
         isOpen: true,
         position: { lat, lng }
@@ -39,11 +33,10 @@ const Index = () => {
   const handleAddLocation = async (data: {
     twitter_username: string;
     comment: string;
-    country_name: string;
     latitude: number;
     longitude: number;
   }) => {
-    await addComment(data);
+    await addNote(data);
     setIsAddingMode(false);
   };
 
@@ -51,7 +44,6 @@ const Index = () => {
     setIsAddingMode(!isAddingMode);
   };
 
-  // Set dark mode on body
   useEffect(() => {
     document.body.classList.add('dark');
     document.documentElement.classList.add('dark');
@@ -74,45 +66,48 @@ const Index = () => {
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-background">
-      {/* Succinct Logo */}
-      <div className="absolute top-5 left-5 z-[1000]">
-        <img 
-          src="https://testnet.succinct.xyz/images/succinct-icon-pink.svg" 
-          alt="Succinct Logo" 
-          className="w-12 h-12 drop-shadow-lg" 
-        />
+      {/* Succinct Logo + Title Centered Container */}
+      <div className="absolute top-4 sm:top-5 left-1/2 transform -translate-x-1/2 z-[1000] w-full flex justify-center px-2">
+        <div
+          className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-2xl"
+          style={{
+            background: 'rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            maxWidth: 'min(98vw, 600px)',
+            width: '100%',
+          }}
+        >
+          <img
+            src="/Boundless_Logo white.png"
+            alt="Boundless Logo"
+            className="w-12 h-9 sm:w-16 sm:h-12 drop-shadow-lg flex-shrink-0 object-contain"
+          />
+          <span className="text-sm sm:text-lg font-semibold text-white drop-shadow-sm whitespace-nowrap text-center" style={{lineHeight: 1.2}}>
+            Write about Boundless on world map
+          </span>
+        </div>
       </div>
 
       {/* Main Map */}
       <InteractiveMap
-        comments={comments}
+        comments={notes}
         onMapClick={handleMapClick}
         isAddingMode={isAddingMode}
-        onAddReaction={addReaction}
-        onRemoveReaction={removeReaction}
       />
 
       {/* Add Location Button */}
-      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-[1000]">
+      <div className="fixed bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-[1000]">
         <Button
           variant="map-primary"
           size="lg"
           onClick={toggleAddingMode}
-          className={`font-bold py-3 px-6 rounded-full ${
-            isAddingMode ? 'w-72' : ''
-          } transition-all duration-300`}
+          className={`font-bold py-3 px-4 sm:px-6 rounded-full min-h-[44px] ${
+            isAddingMode ? 'w-64 sm:w-72' : ''
+          } transition-all duration-300 text-sm sm:text-base`}
         >
           {isAddingMode ? 'Click on the map to select a location' : 'Pin on Map'}
         </Button>
-      </div>
-
-      {/* Recent Notes Feed */}
-      <div className="fixed bottom-8 left-5 z-[1000] hidden md:block">
-        <RecentNotesFeed
-          comments={comments}
-          onAddReaction={addReaction}
-          onRemoveReaction={removeReaction}
-        />
       </div>
 
       {/* Location Modal */}

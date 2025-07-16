@@ -1,36 +1,36 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { CommentWithReactions } from '@/types/map';
-import { EmojiReactions } from './EmojiReactions';
+import { UserNote } from '@/types/map';
 import { formatDistanceToNow } from 'date-fns';
 
-// Import marker cluster
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+// Remove marker cluster imports
+// import 'leaflet.markercluster/dist/MarkerCluster.css';
+// import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 // @ts-ignore
-import 'leaflet.markercluster';
+// import 'leaflet.markercluster';
 
 interface InteractiveMapProps {
-  comments: CommentWithReactions[];
+  comments: UserNote[];
   onMapClick: (lat: number, lng: number) => void;
   isAddingMode: boolean;
-  onAddReaction: (commentId: string, emoji: string) => void;
-  onRemoveReaction: (commentId: string, emoji: string) => void;
 }
 
 export const InteractiveMap = ({ 
   comments, 
   onMapClick, 
   isAddingMode,
-  onAddReaction,
-  onRemoveReaction
 }: InteractiveMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [isClusterView, setIsClusterView] = useState(false);
+  // Remove isClusterView and clusterGroupRef
+  // const [isClusterView, setIsClusterView] = useState(false);
   const markersRef = useRef<L.LayerGroup>(new L.LayerGroup());
-  const clusterGroupRef = useRef<any>(null);
+  // const clusterGroupRef = useRef<any>(null);
+
+  // React popup state
+  const [activeComment, setActiveComment] = useState<UserNote | null>(null);
+  const [popupPosition, setPopupPosition] = useState<{x: number, y: number} | null>(null);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -55,26 +55,11 @@ export const InteractiveMap = ({
       maxZoom: 20
     }).addTo(map);
 
-    // Initialize cluster group
-    clusterGroupRef.current = new (L as any).MarkerClusterGroup({
-      maxClusterRadius: 50,
-      iconCreateFunction: (cluster: any) => {
-        const count = cluster.getChildCount();
-        const size = count < 10 ? 'small' : count < 100 ? 'medium' : 'large';
-        return L.divIcon({
-          html: `<div><span>${count}</span></div>`,
-          className: `marker-cluster marker-cluster-${size}`,
-          iconSize: L.point(40, 40)
-        });
-      }
-    });
+    // Remove cluster group initialization
+    // clusterGroupRef.current = new (L as any).MarkerClusterGroup({ ... });
 
-    // Add initial layer to map
-    if (isClusterView && clusterGroupRef.current) {
-      map.addLayer(clusterGroupRef.current);
-    } else {
-      map.addLayer(markersRef.current);
-    }
+    // Only add markers layer
+    map.addLayer(markersRef.current);
 
     mapRef.current = map;
 
@@ -119,178 +104,144 @@ export const InteractiveMap = ({
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Clear existing markers
-    markersRef.current.clearLayers();
-    if (clusterGroupRef.current) {
-      clusterGroupRef.current.clearLayers();
+    // Remove markers layer from map (if present)
+    if (mapRef.current.hasLayer(markersRef.current)) {
+      mapRef.current.removeLayer(markersRef.current);
     }
+    // Clear markers
+    markersRef.current.clearLayers();
 
     comments.forEach((comment) => {
       if (comment.latitude && comment.longitude) {
         const icon = L.divIcon({
-          html: `<img class="w-10 h-10 rounded-full border-2 border-pink-500 shadow-lg hover:scale-110 transition-transform" 
+          html: `<div class="avatar-marker-container"><img class="w-10 h-10 rounded-full border-2 border-pink-500 shadow-lg hover:scale-110 transition-transform" 
                       src="https://unavatar.io/x/${comment.twitter_username}" 
                       alt="${comment.twitter_username}" 
-                      onerror="this.src='https://testnet.succinct.xyz/images/succinct-icon-pink.svg';" />`,
+                      onerror="this.src='/Boundless_Logo white.png';" /></div>`,
           className: 'avatar-marker',
           iconSize: [40, 40],
           iconAnchor: [20, 20],
-          popupAnchor: [0, -20]
+          popupAnchor: [0, 0]
         });
 
         const marker = L.marker([comment.latitude, comment.longitude], { icon });
 
-        // Create popup content with React component
-        const popupContent = document.createElement('div');
-        popupContent.className = 'p-3 min-w-64';
-        popupContent.innerHTML = `
-          <div class="space-y-3">
-            <div class="flex items-center gap-2">
-              <img src="https://unavatar.io/x/${comment.twitter_username}" 
-                   class="w-8 h-8 rounded-full border-2 border-pink-500" 
-                   alt="${comment.twitter_username}"
-                   onerror="this.src='https://testnet.succinct.xyz/images/succinct-icon-pink.svg';" />
-              <div>
-                <h4 class="font-bold text-pink-400 text-lg">@${comment.twitter_username}</h4>
-                <p class="text-xs text-gray-400">${formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}</p>
-              </div>
-            </div>
-            <p class="text-gray-300 leading-relaxed">${comment.comment}</p>
-            <p class="text-xs text-gray-400">📍 ${comment.country_name}</p>
-            <div id="reactions-${comment.id}"></div>
-          </div>
-        `;
-
-        marker.bindPopup(popupContent, {
-          className: 'custom-popup',
-          maxWidth: 300,
-          closeButton: true
-        });
-
-        // Add event listener for when popup opens to render reactions
-        marker.on('popupopen', () => {
-          const reactionsContainer = document.getElementById(`reactions-${comment.id}`);
-          if (reactionsContainer) {
-            // Group reactions by emoji
-            const reactionCounts = comment.reactions.reduce((acc, reaction) => {
-              acc[reaction.emoji] = (acc[reaction.emoji] || 0) + 1;
-              return acc;
-            }, {} as Record<string, number>);
-
-            // Create reaction buttons
-            const reactionsHTML = Object.entries(reactionCounts)
-              .map(([emoji, count]) => 
-                `<button class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-gray-800 hover:bg-gray-700 border border-gray-600 mr-1 mb-1" 
-                         onclick="window.toggleReaction('${comment.id}', '${emoji}')">
-                   ${emoji} ${count}
-                 </button>`
-              ).join('');
-
-            reactionsContainer.innerHTML = `
-              <div class="flex flex-wrap gap-1">
-                ${reactionsHTML}
-                <button class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-gray-800 hover:bg-gray-700 border border-gray-600" 
-                        onclick="window.showEmojiPicker('${comment.id}')">
-                  + 😊
-                </button>
-              </div>
-            `;
+        // On marker click, set active comment and popup position
+        marker.on('click', (e) => {
+          setActiveComment(comment);
+          if (mapRef.current) {
+            const point = mapRef.current.latLngToContainerPoint([comment.latitude, comment.longitude]);
+            setPopupPosition({ x: point.x, y: point.y });
           }
         });
 
-        // Add marker to appropriate layer
+        // REMOVE: Leaflet popup creation and popupopen logic
+        // We'll handle popups in React
+
         markersRef.current.addLayer(marker);
-        if (clusterGroupRef.current) {
-          clusterGroupRef.current.addLayer(marker);
-        }
       }
     });
+
+    // Add markers layer back to map
+    mapRef.current.addLayer(markersRef.current);
   }, [comments]);
 
   // Add global functions for popup interactions
   useEffect(() => {
-    (window as any).toggleReaction = (commentId: string, emoji: string) => {
-      const comment = comments.find(c => c.id === commentId);
-      if (comment) {
-        const existingReaction = comment.reactions.find(r => r.emoji === emoji);
-        if (existingReaction) {
-          onRemoveReaction(commentId, emoji);
-        } else {
-          onAddReaction(commentId, emoji);
-        }
-      }
-    };
-
-    (window as any).showEmojiPicker = (commentId: string) => {
-      const emojis = ['👍', '❤️', '😍', '🎉', '🔥', '👏', '💯', '🚀'];
-      const emojiButtons = emojis.map(emoji => 
-        `<button class="text-lg p-2 hover:bg-gray-700 rounded" onclick="window.addReaction('${commentId}', '${emoji}')">${emoji}</button>`
-      ).join('');
-      
-      const picker = document.createElement('div');
-      picker.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[10000]';
-      picker.innerHTML = `
-        <div class="bg-gray-800 p-4 rounded-lg border border-gray-600">
-          <div class="grid grid-cols-4 gap-2 mb-4">
-            ${emojiButtons}
-          </div>
-          <button class="w-full bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-white" onclick="this.parentElement.parentElement.remove()">
-            Cancel
-          </button>
-        </div>
-      `;
-      document.body.appendChild(picker);
-    };
-
-    (window as any).addReaction = (commentId: string, emoji: string) => {
-      onAddReaction(commentId, emoji);
-      // Close picker
-      const picker = document.querySelector('.fixed.inset-0');
-      if (picker) picker.remove();
-    };
-
     return () => {
-      delete (window as any).toggleReaction;
-      delete (window as any).showEmojiPicker;
-      delete (window as any).addReaction;
     };
-  }, [comments, onAddReaction, onRemoveReaction]);
+  }, []);
 
-  const toggleView = () => {
+  // Close popup on map click
+  useEffect(() => {
     if (!mapRef.current) return;
+    const closePopup = () => {
+      setActiveComment(null);
+      setPopupPosition(null);
+    };
+    mapRef.current.on('click', closePopup);
+    return () => {
+      mapRef.current?.off('click', closePopup);
+    };
+  }, []);
 
-    const newClusterView = !isClusterView;
-    setIsClusterView(newClusterView);
+  // Add effect to update popup position on map move/zoom/resize
+  useEffect(() => {
+    if (!activeComment || !mapRef.current) return;
+    const updatePopupPosition = () => {
+      const point = mapRef.current!.latLngToContainerPoint([activeComment.latitude, activeComment.longitude]);
+      setPopupPosition({ x: point.x, y: point.y });
+    };
+    mapRef.current.on('move zoom', updatePopupPosition);
+    window.addEventListener('resize', updatePopupPosition);
+    updatePopupPosition();
+    return () => {
+      mapRef.current?.off('move', updatePopupPosition);
+      mapRef.current?.off('zoom', updatePopupPosition);
+      window.removeEventListener('resize', updatePopupPosition);
+    };
+  }, [activeComment]);
 
-    if (newClusterView && clusterGroupRef.current) {
-      mapRef.current.removeLayer(markersRef.current);
-      mapRef.current.addLayer(clusterGroupRef.current);
-    } else {
-      if (clusterGroupRef.current) {
-        mapRef.current.removeLayer(clusterGroupRef.current);
-      }
-      mapRef.current.addLayer(markersRef.current);
-    }
-  };
+  // Helper to determine popup direction based on available space
+  function getPopupTransform(x: number, y: number) {
+    if (!mapContainerRef.current) return 'translate(-50%, -100%)';
+    const mapRect = mapContainerRef.current.getBoundingClientRect();
+    const isMobile = window.innerWidth <= 768;
+    const popupHeight = isMobile ? 180 : 220; // smaller on mobile
+    const popupWidth = isMobile ? 280 : 340;
+    // If not enough space above, show below
+    if (y - popupHeight < 0) return 'translate(-50%, 10px)';
+    // If not enough space to the right, show left
+    if (x + popupWidth/2 > mapRect.width) return 'translate(-100%, -50%)';
+    // If not enough space to the left, show right
+    if (x - popupWidth/2 < 0) return 'translate(0, -50%)';
+    // Default: above
+    return 'translate(-50%, -100%)';
+  }
 
   return (
-    <div className="relative h-screen w-full">
-      <div ref={mapContainerRef} className="h-full w-full bg-map-bg" />
-      
-      {/* View Toggle */}
-      <div className="absolute top-4 right-4 z-[1000] bg-map-glass backdrop-blur-sm border border-map-glass-border p-3 rounded-lg flex items-center space-x-3 text-sm">
-        <span className="text-foreground">Avatar View</span>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={isClusterView}
-            onChange={toggleView}
-            className="sr-only peer"
-          />
-          <div className="relative w-11 h-6 bg-map-surface peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-        </label>
-        <span className="text-foreground">Cluster View</span>
-      </div>
+    <div style={{position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', inset: 0, zIndex: 0}}>
+      <div ref={mapContainerRef} style={{width: '100vw', height: '100vh', background: 'var(--map-bg)'}} />
+      {activeComment && popupPosition && (
+        <div
+          className="custom-popup"
+          style={{
+            position: 'absolute',
+            left: popupPosition.x,
+            top: popupPosition.y,
+            transform: getPopupTransform(popupPosition.x, popupPosition.y) + ' scale(1)',
+            zIndex: 2000,
+            opacity: 1,
+            transition: 'opacity 0.3s, transform 0.3s',
+            background: 'rgba(34, 38, 54, 0.98)',
+            borderRadius: 22,
+            boxShadow: '0 8px 32px 0 rgba(0,0,0,0.35), 0 0 18px 3px #ff6ec4',
+            minWidth: 260,
+            maxWidth: 360,
+            color: '#fff',
+            padding: '28px 24px 20px 24px',
+            border: '2.5px solid #ff6ec4',
+            fontFamily: 'Lexend, system-ui, sans-serif',
+          }}
+        >
+          <button onClick={() => { setActiveComment(null); setPopupPosition(null); }} style={{position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', color: '#ff6ec4', fontSize: 24, cursor: 'pointer', zIndex: 10, lineHeight: 1}}>&times;</button>
+          <div className="flex items-center gap-3 mb-2">
+            <img src={`https://unavatar.io/x/${activeComment.twitter_username}`}
+                 className="w-10 h-10 rounded-full border-2 border-pink-500 shadow-lg bg-white"
+                 alt={activeComment.twitter_username}
+                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/Boundless_Logo white.png'; }}
+            />
+            <div>
+              <h4 className="font-bold text-lg bg-gradient-to-r from-pink-400 to-fuchsia-500 text-transparent bg-clip-text">@{activeComment.twitter_username}</h4>
+              <p className="text-xs text-gray-400 popup-time">{formatDistanceToNow(new Date(activeComment.created_at), { addSuffix: true })}</p>
+            </div>
+          </div>
+          <div className="popup-comment-card">
+            <span className="popup-comment-text">{activeComment.comment}</span>
+          </div>
+          {/* You can add reactions here if needed */}
+        </div>
+      )}
     </div>
   );
 };

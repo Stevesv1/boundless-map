@@ -41,50 +41,35 @@ export type Database = {
             foreignKeyName: "comment_reactions_comment_id_fkey"
             columns: ["comment_id"]
             isOneToOne: false
-            referencedRelation: "user_comments"
+            referencedRelation: "user_notes"
             referencedColumns: ["id"]
           },
         ]
-      }
-      user_comments: {
+      },
+      user_notes: {
         Row: {
-          comment: string
-          country_code: string
-          country_name: string
-          created_at: string
           id: string
-          latitude: number | null
-          longitude: number | null
-          twitter_display_name: string | null
-          twitter_profile_pic: string | null
           twitter_username: string
-          updated_at: string
+          comment: string
+          latitude: number
+          longitude: number
+          created_at: string
         }
         Insert: {
-          comment: string
-          country_code: string
-          country_name: string
-          created_at?: string
           id?: string
-          latitude?: number | null
-          longitude?: number | null
-          twitter_display_name?: string | null
-          twitter_profile_pic?: string | null
           twitter_username: string
-          updated_at?: string
+          comment: string
+          latitude: number
+          longitude: number
+          created_at?: string
         }
         Update: {
-          comment?: string
-          country_code?: string
-          country_name?: string
-          created_at?: string
           id?: string
-          latitude?: number | null
-          longitude?: number | null
-          twitter_display_name?: string | null
-          twitter_profile_pic?: string | null
           twitter_username?: string
-          updated_at?: string
+          comment?: string
+          latitude?: number
+          longitude?: number
+          created_at?: string
         }
         Relationships: []
       }

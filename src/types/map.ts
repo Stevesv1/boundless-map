@@ -1,15 +1,10 @@
-export interface UserComment {
+export interface UserNote {
   id: string;
-  comment: string;
-  country_code: string;
-  country_name: string;
-  created_at: string;
-  latitude: number | null;
-  longitude: number | null;
-  twitter_display_name: string | null;
-  twitter_profile_pic: string | null;
   twitter_username: string;
-  updated_at: string;
+  comment: string;
+  latitude: number;
+  longitude: number;
+  created_at: string;
 }
 
 export interface CommentReaction {
@@ -20,7 +15,7 @@ export interface CommentReaction {
   created_at: string;
 }
 
-export interface CommentWithReactions extends UserComment {
+export interface NoteWithReactions extends UserNote {
   reactions: CommentReaction[];
 }
 

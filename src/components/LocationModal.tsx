@@ -13,7 +13,6 @@ interface LocationModalProps {
   onSubmit: (data: {
     twitter_username: string;
     comment: string;
-    country_name: string;
     latitude: number;
     longitude: number;
   }) => Promise<void>;
@@ -22,8 +21,7 @@ interface LocationModalProps {
 export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationModalProps) => {
   const [formData, setFormData] = useState({
     twitter_username: '',
-    comment: '',
-    country_name: ''
+    comment: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -42,8 +40,7 @@ export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationM
       // Reset form
       setFormData({
         twitter_username: '',
-        comment: '',
-        country_name: ''
+        comment: ''
       });
       onClose();
     } catch (error) {
@@ -56,8 +53,7 @@ export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationM
   const handleClose = () => {
     setFormData({
       twitter_username: '',
-      comment: '',
-      country_name: ''
+      comment: ''
     });
     onClose();
   };
@@ -66,49 +62,48 @@ export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationM
   
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-map-glass backdrop-blur-lg border-map-glass-border z-[9999]">
+      <DialogContent className="w-[95vw] max-w-md bg-map-glass backdrop-blur-lg border-map-glass-border z-[9999] mx-4">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-center text-primary">
+          <DialogTitle className="text-lg sm:text-xl font-bold text-center text-primary">
             Pin Your Location
           </DialogTitle>
-          <DialogDescription className="text-center text-muted-foreground">
+          <DialogDescription className="text-center text-muted-foreground text-sm">
             Share your location and add a note to the map
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="twitter_username" className="text-sm font-medium text-muted-foreground">
+            <Label htmlFor="twitter_username" className="text-sm font-medium text-muted-foreground block">
               Your X (Twitter) Username
             </Label>
-            <Input
-              id="twitter_username"
-              type="text"
-              value={formData.twitter_username}
-              onChange={(e) => setFormData(prev => ({ ...prev, twitter_username: e.target.value }))}
-              placeholder="e.g., 0xcrashout"
-              required
-              className="bg-map-surface border-map-border focus:ring-primary focus:border-primary"
-            />
+            <div className="flex items-center gap-3">
+              <Input
+                id="twitter_username"
+                type="text"
+                value={formData.twitter_username}
+                onChange={(e) => setFormData(prev => ({ ...prev, twitter_username: e.target.value }))}
+                placeholder="e.g., 0xcrashout"
+                required
+                className="bg-map-surface border-map-border focus:ring-primary focus:border-primary min-h-[44px]"
+              />
+              {formData.twitter_username && (
+                <img
+                  src={`https://unavatar.io/x/${formData.twitter_username}`}
+                  alt={formData.twitter_username}
+                  className="w-8 h-8 rounded-full border-2 border-primary bg-background flex-shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.src = '/Boundless_Logo white.png';
+                  }}
+                />
+              )}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="country_name" className="text-sm font-medium text-muted-foreground">
-              Country/City
-            </Label>
-            <Input
-              id="country_name"
-              type="text"
-              value={formData.country_name}
-              onChange={(e) => setFormData(prev => ({ ...prev, country_name: e.target.value }))}
-              placeholder="e.g., Istanbul, Turkey"
-              required
-              className="bg-map-surface border-map-border focus:ring-primary focus:border-primary"
-            />
-          </div>
+          {/* Removed Country/City input */}
 
           <div className="space-y-2">
-            <Label htmlFor="comment" className="text-sm font-medium text-muted-foreground">
+            <Label htmlFor="comment" className="text-sm font-medium text-muted-foreground block">
               Your Note
             </Label>
             <Textarea
@@ -118,23 +113,23 @@ export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationM
               placeholder="e.g., Greetings from Istanbul!"
               required
               rows={3}
-              className="bg-map-surface border-map-border focus:ring-primary focus:border-primary resize-none"
+              className="bg-map-surface border-map-border focus:ring-primary focus:border-primary resize-none min-h-[44px]"
             />
           </div>
 
-          <div className="flex gap-4 pt-4">
+          <div className="flex gap-3 sm:gap-4 pt-4">
             <Button
               type="button"
               variant="secondary"
               onClick={handleClose}
-              className="flex-1"
+              className="flex-1 min-h-[44px]"
               disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-primary hover:bg-primary/90"
+              className="flex-1 bg-primary hover:bg-primary/90 min-h-[44px]"
               disabled={loading}
             >
               {loading ? (
