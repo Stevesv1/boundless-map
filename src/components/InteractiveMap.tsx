@@ -4,11 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import { UserNote } from '@/types/map';
 import { formatDistanceToNow } from 'date-fns';
 
-// Remove marker cluster imports
-// import 'leaflet.markercluster/dist/MarkerCluster.css';
-// import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-// @ts-ignore
-// import 'leaflet.markercluster';
 
 interface InteractiveMapProps {
   comments: UserNote[];
@@ -50,7 +45,7 @@ export const InteractiveMap = ({
 
     // Add dark tile layer
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      attribution: 'Made with ❤️ by <a href="https://x.com/Zun2025" target="_blank">Zun</a>',
       subdomains: 'abcd',
       maxZoom: 20
     }).addTo(map);
@@ -226,18 +221,25 @@ export const InteractiveMap = ({
         >
           <button onClick={() => { setActiveComment(null); setPopupPosition(null); }} style={{position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', color: '#ff6ec4', fontSize: 24, cursor: 'pointer', zIndex: 10, lineHeight: 1}}>&times;</button>
           <div className="flex items-center gap-3 mb-2">
-            <img src={`https://unavatar.io/x/${activeComment.twitter_username}`}
-                 className="w-10 h-10 rounded-full border-2 border-pink-500 shadow-lg bg-white"
-                 alt={activeComment.twitter_username}
-                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/Boundless_Logo white.png'; }}
+            <img 
+              src={`https://unavatar.io/x/${activeComment.twitter_username}`}
+              className="w-10 h-10 rounded-full border-2 border-pink-500 shadow-lg bg-white cursor-pointer hover:scale-110 transition-transform"
+              alt={activeComment.twitter_username}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/Boundless_Logo white.png'; }}
+              onClick={() => window.open(`https://x.com/${activeComment.twitter_username}`, '_blank')}
             />
             <div>
-              <h4 className="font-bold text-lg bg-gradient-to-r from-pink-400 to-fuchsia-500 text-transparent bg-clip-text">@{activeComment.twitter_username}</h4>
+              <h4 
+                className="font-bold text-lg bg-gradient-to-r from-pink-400 to-fuchsia-500 text-transparent bg-clip-text cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => window.open(`https://x.com/${activeComment.twitter_username}`, '_blank')}
+              >
+                @{activeComment.twitter_username}
+              </h4>
               <p className="text-xs text-gray-400 popup-time">{formatDistanceToNow(new Date(activeComment.created_at), { addSuffix: true })}</p>
             </div>
           </div>
           <div className="popup-comment-card">
-            <span className="popup-comment-text">{activeComment.comment}</span>
+            <div className="popup-comment-text">{activeComment.comment}</div>
           </div>
           {/* You can add reactions here if needed */}
         </div>
