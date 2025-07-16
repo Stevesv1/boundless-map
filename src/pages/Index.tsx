@@ -13,10 +13,14 @@ const Index = () => {
     position: null
   });
   
+  console.log('Index render:', { isAddingMode, modalState });
+  
   const { comments, loading, addComment, addReaction, removeReaction } = useMapData();
 
   const handleMapClick = (lat: number, lng: number) => {
+    console.log('handleMapClick called:', { lat, lng, isAddingMode });
     if (isAddingMode) {
+      console.log('Setting modal state to open');
       setModalState({
         isOpen: true,
         position: { lat, lng }

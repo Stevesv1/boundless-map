@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -62,13 +62,18 @@ export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationM
     onClose();
   };
 
+  console.log('LocationModal render:', { isOpen, position });
+  
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-map-glass backdrop-blur-lg border-map-glass-border">
+      <DialogContent className="sm:max-w-md bg-map-glass backdrop-blur-lg border-map-glass-border z-[9999]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center text-primary">
             Pin Your Location
           </DialogTitle>
+          <DialogDescription className="text-center text-muted-foreground">
+            Share your location and add a note to the map
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
