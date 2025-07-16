@@ -5,13 +5,11 @@ import { CommentWithReactions } from '@/types/map';
 import { EmojiReactions } from './EmojiReactions';
 import { formatDistanceToNow } from 'date-fns';
 
-// Import marker cluster if available
-let MarkerClusterGroup: any;
-try {
-  MarkerClusterGroup = require('leaflet.markercluster');
-} catch (e) {
-  console.log('Marker cluster not available');
-}
+// Import marker cluster
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+// @ts-ignore
+import 'leaflet.markercluster';
 
 interface InteractiveMapProps {
   comments: CommentWithReactions[];
@@ -57,21 +55,19 @@ export const InteractiveMap = ({
       maxZoom: 20
     }).addTo(map);
 
-    // Initialize cluster group if available
-    if (MarkerClusterGroup) {
-      clusterGroupRef.current = new MarkerClusterGroup({
-        maxClusterRadius: 50,
-        iconCreateFunction: (cluster: any) => {
-          const count = cluster.getChildCount();
-          const size = count < 10 ? 'small' : count < 100 ? 'medium' : 'large';
-          return L.divIcon({
-            html: `<div><span>${count}</span></div>`,
-            className: `marker-cluster marker-cluster-${size}`,
-            iconSize: L.point(40, 40)
-          });
-        }
-      });
-    }
+    // Initialize cluster group
+    clusterGroupRef.current = new (L as any).MarkerClusterGroup({
+      maxClusterRadius: 50,
+      iconCreateFunction: (cluster: any) => {
+        const count = cluster.getChildCount();
+        const size = count < 10 ? 'small' : count < 100 ? 'medium' : 'large';
+        return L.divIcon({
+          html: `<div><span>${count}</span></div>`,
+          className: `marker-cluster marker-cluster-${size}`,
+          iconSize: L.point(40, 40)
+        });
+      }
+    });
 
     // Add initial layer to map
     if (isClusterView && clusterGroupRef.current) {
