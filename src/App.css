@@ -1,17 +1,17 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
   text-align: center;
 }
 
 /* Mobile compatibility improvements */
 @supports (padding: max(0px)) {
   #root {
-    padding-left: max(2rem, env(safe-area-inset-left));
-    padding-right: max(2rem, env(safe-area-inset-right));
-    padding-top: max(2rem, env(safe-area-inset-top));
-    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
@@ -296,12 +296,13 @@
 .popup-comment-card {
   flex: 1 1 auto;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   background: rgba(24, 24, 32, 0.92);
   border-radius: 12px;
   box-shadow: none;
   margin: 10px 0 8px 0;
-  padding: 12px 14px 12px 0;
+  padding: 12px 14px;
   position: relative;
   min-height: 40px;
   max-width: 100%;
@@ -324,12 +325,9 @@
   white-space: pre-line;
   line-height: 1.5;
   letter-spacing: 0.01em;
-  padding-right: 2px;
   max-width: 100%;
   width: 100%;
-  height: 100%;
-  display: block;
-  max-height: 100%;
+  text-align: center;
   overflow-y: auto;
   /* Hide scrollbar by default, show on hover */
   scrollbar-width: thin;
