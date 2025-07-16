@@ -76,13 +76,6 @@ export const InteractiveMap = ({
       map.addLayer(markersRef.current);
     }
 
-    // Handle map clicks
-    map.on('click', (e) => {
-      if (isAddingMode) {
-        onMapClick(e.latlng.lat, e.latlng.lng);
-      }
-    });
-
     mapRef.current = map;
 
     return () => {
@@ -92,6 +85,28 @@ export const InteractiveMap = ({
       }
     };
   }, []);
+
+  // Handle map clicks - separate effect to capture current isAddingMode
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const handleMapClick = (e: L.LeafletMouseEvent) => {
+      console.log('Map clicked, isAddingMode:', isAddingMode, 'position:', e.latlng);
+      if (isAddingMode) {
+        e.originalEvent?.preventDefault();
+        e.originalEvent?.stopPropagation();
+        onMapClick(e.latlng.lat, e.latlng.lng);
+      }
+    };
+
+    mapRef.current.on('click', handleMapClick);
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.off('click', handleMapClick);
+      }
+    };
+  }, [isAddingMode, onMapClick]);
 
   // Update cursor when adding mode changes
   useEffect(() => {
