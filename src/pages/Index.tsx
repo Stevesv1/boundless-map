@@ -66,7 +66,6 @@ const Index = () => {
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-background">
-      {/* Succinct Logo + Title Centered Container */}
       <div className="absolute top-4 sm:top-5 left-1/2 transform -translate-x-1/2 z-[1000] w-full flex justify-center px-2">
         <div
           className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-2xl"
