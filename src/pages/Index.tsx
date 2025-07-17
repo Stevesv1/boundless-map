@@ -84,7 +84,7 @@ const Index = () => {
             className="w-12 h-9 sm:w-16 sm:h-12 drop-shadow-lg flex-shrink-0 object-contain"
           />
           <span className="text-sm sm:text-lg font-semibold text-white drop-shadow-sm whitespace-nowrap text-center" style={{lineHeight: 1.2}}>
-            Write about Boundless on world map
+            Write about Boundless on World Map
           </span>
         </div>
       </div>
