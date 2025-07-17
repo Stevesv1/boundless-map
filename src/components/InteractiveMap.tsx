@@ -238,8 +238,8 @@ export const InteractiveMap = ({
               <p className="text-xs text-gray-400 popup-time">{formatDistanceToNow(new Date(activeComment.created_at), { addSuffix: true })}</p>
             </div>
           </div>
-          <div className="popup-comment-card">
-            <div className="popup-comment-text">{activeComment.comment}</div>
+          <div className="popup-comment-card" style={{background: 'rgba(34, 38, 54, 0.38)', borderRadius: 12, boxShadow: '0 0 0 0', border: '1.5px solid #ff6ec4', padding: '12px 14px', margin: '10px 0 8px 0', minHeight: 40, maxWidth: '100%', width: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <div className="popup-comment-text" style={{maxHeight: 120, overflowY: 'auto', width: '100%', background: 'rgba(24, 24, 32, 0.92)', borderRadius: 10, border: '1px solid rgba(255,110,196,0.3)', boxShadow: '0 0 8px 0 #ff6ec433', padding: '8px 10px'}}>{activeComment.comment}</div>
           </div>
           {/* You can add reactions here if needed */}
         </div>
