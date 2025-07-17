@@ -75,7 +75,7 @@ export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationM
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="twitter_username" className="text-sm font-medium text-muted-foreground block">
-              Your X (Twitter) Username
+              Your X Username
             </Label>
             <div className="flex items-center gap-3">
               <Input
@@ -83,7 +83,7 @@ export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationM
                 type="text"
                 value={formData.twitter_username}
                 onChange={(e) => setFormData(prev => ({ ...prev, twitter_username: e.target.value }))}
-                placeholder="e.g., 0xcrashout"
+                placeholder="e.g., Zun2025"
                 required
                 className="bg-map-surface border-map-border focus:ring-primary focus:border-primary min-h-[44px]"
               />
@@ -104,13 +104,13 @@ export const LocationModal = ({ isOpen, onClose, position, onSubmit }: LocationM
 
           <div className="space-y-2">
             <Label htmlFor="comment" className="text-sm font-medium text-muted-foreground block">
-              Your Note
+              Your Comment
             </Label>
             <Textarea
               id="comment"
               value={formData.comment}
               onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
-              placeholder="e.g., Greetings from Istanbul!"
+              placeholder="e.g., gBerry 🍓🍓"
               required
               rows={3}
               className="bg-map-surface border-map-border focus:ring-primary focus:border-primary resize-none min-h-[44px]"
