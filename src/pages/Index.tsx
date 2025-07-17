@@ -101,9 +101,7 @@ const Index = () => {
           variant="map-primary"
           size="lg"
           onClick={toggleAddingMode}
-          className={`font-bold py-3 px-4 sm:px-6 rounded-full min-h-[44px] ${
-            isAddingMode ? 'w-64 sm:w-72' : ''
-          } transition-all duration-300 text-sm sm:text-base`}
+          className={`font-bold py-3 px-8 rounded-full min-h-[44px] min-w-[260px] flex items-center justify-center transition-all duration-300 text-sm sm:text-base`}
         >
           {isAddingMode ? 'Click on the map to select a location' : 'Pin on Map'}
         </Button>
